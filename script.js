@@ -1,611 +1,942 @@
 // DOM Elements
-const menuToggle = document.querySelector('.menu-toggle');
-const navLinks = document.querySelector('.nav-links');
+const themeToggle = document.getElementById('theme-toggle');
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
-const journalText = document.getElementById('journal-text');
+const startQuizBtn = document.getElementById('start-quiz');
+const quizIntro = document.getElementById('quiz-intro');
+const quizQuestions = document.getElementById('quiz-questions');
+const quizResults = document.getElementById('quiz-results');
+const prevQuestionBtn = document.getElementById('prev-question');
+const nextQuestionBtn = document.getElementById('next-question');
+const questionCounter = document.querySelector('.question-counter');
+const retakeQuizBtn = document.getElementById('retake-quiz');
 const saveEntryBtn = document.getElementById('save-entry');
 const clearEntryBtn = document.getElementById('clear-entry');
+const journalText = document.getElementById('journal-text');
 const entriesList = document.getElementById('entries-list');
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
-const startBreathingBtn = document.getElementById('start-breathing');
-const stopBreathingBtn = document.getElementById('stop-breathing');
+const gratitudeInput = document.getElementById('gratitude-input');
+const addGratitudeBtn = document.getElementById('add-gratitude');
+const gratitudeWall = document.getElementById('gratitude-wall');
+const dailyTip = document.getElementById('daily-tip');
+const newTipBtn = document.getElementById('new-tip');
+const installPrompt = document.getElementById('install-prompt');
+const installBtn = document.getElementById('install-btn');
+const dismissPromptBtn = document.getElementById('dismiss-prompt');
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
+
+// App State
+let currentTheme = 'light';
+let currentQuestion = 1;
+let quizAnswers = [];
+let deferredPrompt = null;
+let journalEntries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+let gratitudeNotes = JSON.parse(localStorage.getItem('gratitudeNotes')) || [];
+
+// Mental Health Tips
+const tips = [
+  "Practice deep breathing for 5 minutes when you wake up to start your day calmly.",
+  "Write down three things you're grateful for each day to cultivate positivity.",
+  "Take short breaks every hour to stretch and move your body.",
+  "Limit screen time before bed to improve sleep quality.",
+  "Connect with a friend or loved one at least once a day.",
+  "Practice mindfulness by focusing on your senses for a few minutes.",
+  "Engage in physical activity you enjoy for at least 30 minutes daily.",
+  "Set small, achievable goals to build confidence and motivation.",
+  "Limit caffeine intake, especially in the afternoon and evening.",
+  "Create a relaxing bedtime routine to signal your body it's time to sleep.",
+  "Challenge negative thoughts by asking if they're truly accurate.",
+  "Spend time in nature to reduce stress and improve mood.",
+  "Practice saying 'no' to maintain healthy boundaries.",
+  "Keep a water bottle with you and stay hydrated throughout the day.",
+  "Try progressive muscle relaxation to release tension in your body."
+];
+
+// AI Responses
+const aiResponses = {
+  greeting: [
+    "Hello there! I'm your AI Mental Health Buddy. How are you feeling today?",
+    "Hi! I'm here to listen whenever you need to talk. What's on your mind?",
+    "Welcome back! How can I support you today?"
+  ],
+  positive: [
+    "That's wonderful to hear! What's contributing to these positive feelings?",
+    "I'm so glad you're feeling this way! Would you like to share more?",
+    "It's great that you're experiencing these positive emotions. What's been going well for you lately?"
+  ],
+  neutral: [
+    "I hear you. Would you like to explore what might be causing these feelings?",
+    "It's okay to feel this way. Do you want to talk more about what's on your mind?",
+    "Thank you for sharing. Would you like to discuss this further?"
+  ],
+  negative: [
+    "I'm sorry you're feeling this way. Would you like to talk more about what's bothering you?",
+    "That sounds difficult. Remember that it's okay to feel this way. What's been on your mind?",
+    "I'm here to listen. Would it help to talk more about what you're experiencing?"
+  ],
+  general: [
+    "I appreciate you sharing that with me. How has this been affecting you?",
+    "Thank you for opening up. What else would you like to talk about?",
+    "I'm listening. Would you like to explore this feeling further?"
+  ],
+  resources: [
+    "It might help to explore some of our resources section for additional support.",
+    "Remember you can always try our wellness tools if you need some relaxation techniques.",
+    "The journal feature might be helpful for processing these feelings."
+  ],
+  goodbye: [
+    "Remember I'm here whenever you need to talk. Take care of yourself.",
+    "Thank you for chatting with me today. Be kind to yourself.",
+    "I'm always available if you need more support. Wishing you well."
+  ]
+};
+
+// Breathing Exercise
 const breathingCircle = document.querySelector('.breathing-circle .circle');
 const breathText = document.querySelector('.breath-text');
+const startBreathingBtn = document.getElementById('start-breathing');
+const stopBreathingBtn = document.getElementById('stop-breathing');
+let breathingInterval;
+
+// Sound Therapy
 const soundBtns = document.querySelectorAll('.sound-btn');
 const volumeControl = document.getElementById('volume');
-
-// Global Variables
-let breathingInterval;
 let currentSound = null;
-let isBreathingActive = false;
-const aiResponses = [
-    "I hear you. Would you like to talk more about that?",
-    "That sounds challenging. How has this been affecting you?",
-    "Thank you for sharing that with me. I'm here to listen.",
-    "I can understand why you'd feel that way. What do you think might help?",
-    "Your feelings are valid. Would you like to explore some coping strategies?",
-    "It takes courage to talk about these things. How can I support you right now?",
-    "I'm here for you. What's been the hardest part about this?",
-    "That sounds really difficult. Have you noticed any patterns in how you're feeling?",
-    "I appreciate you opening up. What would be most helpful for you right now?",
-    "You're not alone in this. Would you like to try a relaxation exercise?"
-];
+
+// Pomodoro Timer
+const minutesDisplay = document.getElementById('minutes');
+const secondsDisplay = document.getElementById('seconds');
+const modeDisplay = document.getElementById('mode');
+const startTimerBtn = document.getElementById('start-timer');
+const pauseTimerBtn = document.getElementById('pause-timer');
+const resetTimerBtn = document.getElementById('reset-timer');
+const workDurationInput = document.getElementById('work-duration');
+const breakDurationInput = document.getElementById('break-duration');
+let timerInterval;
+let isWorking = true;
+let isRunning = false;
+let timeLeft = 25 * 60;
+
+// Meditation Timer
+const meditationTime = document.getElementById('meditation-time');
+const startMeditationBtn = document.getElementById('start-meditation');
+const stopMeditationBtn = document.getElementById('stop-meditation');
+const customMinutes = document.getElementById('custom-minutes');
+let meditationInterval;
+
+// Mood Check
+const colorOptions = document.querySelectorAll('.color-option');
+const moodResult = document.getElementById('mood-result');
+const moodSuggestions = {
+  red: {
+    title: "Angry/Frustrated",
+    suggestions: [
+      "Try deep breathing exercises to calm your nervous system",
+      "Go for a walk to release pent-up energy",
+      "Write down what's bothering you in your journal",
+      "Practice progressive muscle relaxation",
+      "Use our sound therapy with calming nature sounds"
+    ]
+  },
+  blue: {
+    title: "Sad/Depressed",
+    suggestions: [
+      "Reach out to a trusted friend or family member",
+      "Engage in gentle physical activity like stretching",
+      "Write down three small things you're grateful for",
+      "Try our guided meditation for emotional support",
+      "Remember that feelings are temporary and will pass"
+    ]
+  },
+  green: {
+    title: "Calm/Peaceful",
+    suggestions: [
+      "Enjoy this moment of peace with mindful breathing",
+      "Consider journaling about what's contributing to this feeling",
+      "Try a gratitude practice to enhance positive emotions",
+      "Engage in a creative activity you enjoy",
+      "Share this calm energy with someone else"
+    ]
+  },
+  yellow: {
+    title: "Happy/Joyful",
+    suggestions: [
+      "Savor this positive emotion and what's creating it",
+      "Share your joy with someone else",
+      "Engage in an activity that brings you pleasure",
+      "Document this moment in your journal",
+      "Express gratitude for this positive experience"
+    ]
+  },
+  purple: {
+    title: "Anxious/Stressed",
+    suggestions: [
+      "Try the 4-7-8 breathing exercise to calm your mind",
+      "Use our guided meditation for anxiety relief",
+      "Write down your worries to get them out of your head",
+      "Practice grounding techniques (name 5 things you can see, 4 you can touch, etc.)",
+      "Break tasks into smaller, manageable steps"
+    ]
+  },
+  gray: {
+    title: "Tired/Exhausted",
+    suggestions: [
+      "Prioritize rest and allow yourself to recharge",
+      "Try a short 10-20 minute power nap",
+      "Hydrate and have a nutritious snack",
+      "Engage in gentle movement like stretching",
+      "Practice self-compassion - it's okay to need rest"
+    ]
+  }
+};
 
 // Initialize the app
 function init() {
-    // Load journal entries from local storage
-    loadJournalEntries();
-    
-    // Set up event listeners
-    setupEventListeners();
+  // Set up event listeners
+  setupEventListeners();
+  
+  // Load saved data
+  loadJournalEntries();
+  loadGratitudeNotes();
+  
+  // Set initial UI states
+  updateThemeIcon();
+  showRandomTip();
+  startAffirmationSlider();
+  
+  // Check for PWA install prompt
+  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  
+  // Check if app is running as PWA
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('Running as PWA');
+  }
 }
 
 // Set up all event listeners
 function setupEventListeners() {
-    // Mobile menu toggle
-    menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        menuToggle.setAttribute('aria-expanded', navLinks.classList.contains('active'));
-    });
-
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('nav a').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            document.querySelector(targetId).scrollIntoView({
-                behavior: 'smooth'
-            });
-            
-            // Close mobile menu if open
-            if (navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-                menuToggle.setAttribute('aria-expanded', 'false');
-            }
-        });
-    });
-
-    // Chat functionality
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
-    // Journal functionality
-    saveEntryBtn.addEventListener('click', saveJournalEntry);
-    clearEntryBtn.addEventListener('click', clearJournalEntry);
-
-    // Tab switching
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabId = btn.getAttribute('data-tab');
-            switchTab(tabId, btn);
-        });
-    });
-
-    // Breathing exercise
-    startBreathingBtn.addEventListener('click', startBreathingExercise);
-    stopBreathingBtn.addEventListener('click', stopBreathingExercise);
-
-    // Sound therapy
-    soundBtns.forEach(btn => {
-        btn.addEventListener('click', () => toggleSound(btn));
-    });
-
-    // Volume control
-    volumeControl.addEventListener('input', adjustVolume);
+  // Theme toggle
+  themeToggle.addEventListener('click', toggleTheme);
+  
+  // Chat functionality
+  sendBtn.addEventListener('click', sendMessage);
+  userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+  
+  // Quiz functionality
+  startQuizBtn.addEventListener('click', startQuiz);
+  prevQuestionBtn.addEventListener('click', showPreviousQuestion);
+  nextQuestionBtn.addEventListener('click', showNextQuestion);
+  retakeQuizBtn.addEventListener('click', resetQuiz);
+  
+  // Journal functionality
+  saveEntryBtn.addEventListener('click', saveJournalEntry);
+  clearEntryBtn.addEventListener('click', clearJournalEntry);
+  
+  // Gratitude wall
+  addGratitudeBtn.addEventListener('click', addGratitudeNote);
+  gratitudeInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addGratitudeNote();
+  });
+  
+  // Daily tip
+  newTipBtn.addEventListener('click', showRandomTip);
+  
+  // PWA install prompt
+  installBtn.addEventListener('click', installPWA);
+  dismissPromptBtn.addEventListener('click', dismissInstallPrompt);
+  
+  // Mobile menu toggle
+  menuToggle.addEventListener('click', toggleMobileMenu);
+  
+  // Wellness tools
+  // Breathing exercise
+  startBreathingBtn.addEventListener('click', startBreathingExercise);
+  stopBreathingBtn.addEventListener('click', stopBreathingExercise);
+  
+  // Sound therapy
+  soundBtns.forEach(btn => {
+    btn.addEventListener('click', toggleSound);
+  });
+  volumeControl.addEventListener('input', adjustVolume);
+  
+  // Pomodoro timer
+  startTimerBtn.addEventListener('click', startTimer);
+  pauseTimerBtn.addEventListener('click', pauseTimer);
+  resetTimerBtn.addEventListener('click', resetTimer);
+  workDurationInput.addEventListener('change', updateTimerSettings);
+  breakDurationInput.addEventListener('change', updateTimerSettings);
+  
+  // Meditation timer
+  document.querySelectorAll('.meditation-timer .timer-buttons button').forEach(btn => {
+    btn.addEventListener('click', setMeditationTimer);
+  });
+  startMeditationBtn.addEventListener('click', startMeditationTimer);
+  stopMeditationBtn.addEventListener('click', stopMeditationTimer);
+  
+  // Mood check
+  colorOptions.forEach(option => {
+    option.addEventListener('click', selectMood);
+  });
+  
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(tab => {
+    tab.addEventListener('click', switchTab);
+  });
 }
 
-// Chat Functions
+// Theme functionality
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+  localStorage.setItem('theme', currentTheme);
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const icon = themeToggle.querySelector('i');
+  if (currentTheme === 'dark') {
+    icon.classList.remove('fa-moon');
+    icon.classList.add('fa-sun');
+  } else {
+    icon.classList.remove('fa-sun');
+    icon.classList.add('fa-moon');
+  }
+}
+
+// Chat functionality
 function sendMessage() {
-    const message = userInput.value.trim();
-    if (message === '') return;
-
-    // Add user message to chat
-    addMessage(message, 'user');
-
-    // Clear input
-    userInput.value = '';
-
-    // Simulate AI typing
-    setTimeout(() => {
-        simulateTyping();
-    }, 1000);
+  const message = userInput.value.trim();
+  if (message === '') return;
+  
+  // Add user message to chat
+  addMessage(message, 'user');
+  userInput.value = '';
+  
+  // Simulate AI typing
+  setTimeout(() => {
+    const aiResponse = generateAIResponse(message);
+    addMessage(aiResponse, 'ai');
+  }, 1000);
 }
 
 function addMessage(text, sender) {
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', `${sender}-message`);
-    
-    const messageText = document.createElement('p');
-    messageText.textContent = text;
-    
-    messageDiv.appendChild(messageText);
-    chatMessages.appendChild(messageDiv);
-    
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message', `${sender}-message`);
+  
+  const messageText = document.createElement('p');
+  messageText.textContent = text;
+  
+  messageDiv.appendChild(messageText);
+  chatMessages.appendChild(messageDiv);
+  
+  // Scroll to bottom
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function simulateTyping() {
-    const typingIndicator = document.createElement('div');
-    typingIndicator.classList.add('message', 'ai-message', 'typing');
-    
-    const dots = document.createElement('div');
-    dots.classList.add('typing-dots');
-    dots.innerHTML = '<span></span><span></span><span></span>';
-    
-    typingIndicator.appendChild(dots);
-    chatMessages.appendChild(typingIndicator);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Simulate AI response after delay
-    setTimeout(() => {
-        // Remove typing indicator
-        chatMessages.removeChild(typingIndicator);
-        
-        // Get random AI response
-        const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-        addMessage(randomResponse, 'ai');
-    }, 1500 + Math.random() * 2000);
+function generateAIResponse(userMessage) {
+  const lowerMessage = userMessage.toLowerCase();
+  
+  // Check for greetings
+  if (/hello|hi|hey/.test(lowerMessage)) {
+    return getRandomResponse(aiResponses.greeting);
+  }
+  
+  // Check for positive sentiment
+  if (/good|great|happy|joy|excit|wonderful|fantastic|amazing/.test(lowerMessage)) {
+    return getRandomResponse(aiResponses.positive);
+  }
+  
+  // Check for negative sentiment
+  if (/bad|sad|depress|anxious|stress|worr|angry|mad|frustrat|terrible|awful/.test(lowerMessage)) {
+    return getRandomResponse(aiResponses.negative);
+  }
+  
+  // Check for neutral sentiment
+  if (/okay|fine|meh|alright|whatever/.test(lowerMessage)) {
+    return getRandomResponse(aiResponses.neutral);
+  }
+  
+  // Check for goodbye
+  if (/bye|goodbye|see you|later|farewell/.test(lowerMessage)) {
+    return getRandomResponse(aiResponses.goodbye);
+  }
+  
+  // Default response
+  return Math.random() > 0.7 ? getRandomResponse(aiResponses.resources) : getRandomResponse(aiResponses.general);
 }
 
-// Journal Functions
+function getRandomResponse(responses) {
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+
+// Quiz functionality
+function startQuiz() {
+  quizIntro.style.display = 'none';
+  quizQuestions.style.display = 'block';
+  document.querySelector(`.question[data-question="1"]`).classList.add('active');
+  updateQuizNavigation();
+}
+
+function showPreviousQuestion() {
+  document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.remove('active');
+  currentQuestion--;
+  document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.add('active');
+  updateQuizNavigation();
+}
+
+function showNextQuestion() {
+  // Save answer if selected
+  const selectedOption = document.querySelector(`.question[data-question="${currentQuestion}"] .option-btn.selected`);
+  if (selectedOption) {
+    quizAnswers[currentQuestion - 1] = parseInt(selectedOption.dataset.value);
+  } else if (quizAnswers[currentQuestion - 1] === undefined) {
+    // If no answer selected and no previous answer, default to 0
+    quizAnswers[currentQuestion - 1] = 0;
+  }
+  
+  // Move to next question or show results
+  if (currentQuestion < 5) {
+    document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.remove('active');
+    currentQuestion++;
+    document.querySelector(`.question[data-question="${currentQuestion}"]`).classList.add('active');
+  } else {
+    showQuizResults();
+  }
+  
+  updateQuizNavigation();
+}
+
+function updateQuizNavigation() {
+  // Update question counter
+  questionCounter.textContent = `${currentQuestion}/5`;
+  
+  // Update button states
+  prevQuestionBtn.disabled = currentQuestion === 1;
+  nextQuestionBtn.textContent = currentQuestion === 5 ? 'See Results' : 'Next';
+  
+  // Highlight selected option if returning to question
+  if (quizAnswers[currentQuestion - 1] !== undefined) {
+    const options = document.querySelectorAll(`.question[data-question="${currentQuestion}"] .option-btn`);
+    options.forEach(option => {
+      if (parseInt(option.dataset.value) === quizAnswers[currentQuestion - 1]) {
+        option.classList.add('selected');
+      }
+    });
+  }
+  
+  // Add event listeners to options
+  const currentOptions = document.querySelectorAll(`.question[data-question="${currentQuestion}"] .option-btn`);
+  currentOptions.forEach(option => {
+    option.addEventListener('click', selectOption);
+  });
+}
+
+function selectOption(e) {
+  // Remove selected class from all options
+  const options = document.querySelectorAll(`.question[data-question="${currentQuestion}"] .option-btn`);
+  options.forEach(option => option.classList.remove('selected'));
+  
+  // Add selected class to clicked option
+  e.target.classList.add('selected');
+}
+
+function showQuizResults() {
+  // Calculate total score
+  const totalScore = quizAnswers.reduce((sum, value) => sum + value, 0);
+  
+  // Display score
+  document.getElementById('score').textContent = totalScore;
+  
+  // Show appropriate message based on score
+  const resultMessage = document.getElementById('result-message');
+  const suggestions = document.getElementById('result-suggestions');
+  
+  if (totalScore <= 4) {
+    resultMessage.innerHTML = "<strong>Your mood seems generally positive.</strong> Keep up the good work with your self-care practices!";
+    suggestions.innerHTML = `
+      <p>Suggestions to maintain your wellbeing:</p>
+      <ul>
+        <li>Continue practicing gratitude and mindfulness</li>
+        <li>Maintain your healthy routines</li>
+        <li>Consider helping others who might be struggling</li>
+        <li>Explore new hobbies or activities that bring you joy</li>
+      </ul>
+    `;
+  } else if (totalScore <= 9) {
+    resultMessage.innerHTML = "<strong>You're experiencing some mild distress.</strong> This is common and there are things that can help.";
+    suggestions.innerHTML = `
+      <p>Suggestions to improve your mood:</p>
+      <ul>
+        <li>Try our breathing exercises or meditation tools</li>
+        <li>Practice regular self-care activities</li>
+        <li>Consider talking to a trusted friend about how you're feeling</li>
+        <li>Use the journal feature to process your emotions</li>
+      </ul>
+    `;
+  } else {
+    resultMessage.innerHTML = "<strong>You're experiencing significant distress.</strong> Please consider reaching out for support.";
+    suggestions.innerHTML = `
+      <p>Suggestions for additional support:</p>
+      <ul>
+        <li>Contact a mental health professional</li>
+        <li>Reach out to trusted friends or family members</li>
+        <li>Consider using our crisis resources if needed</li>
+        <li>Practice self-compassion - what you're feeling is valid</li>
+      </ul>
+      <p>Remember, our resources section has crisis hotlines if you need immediate support.</p>
+    `;
+  }
+  
+  // Show results
+  quizQuestions.style.display = 'none';
+  quizResults.style.display = 'block';
+}
+
+function resetQuiz() {
+  currentQuestion = 1;
+  quizAnswers = [];
+  quizResults.style.display = 'none';
+  quizQuestions.style.display = 'block';
+  
+  // Reset all options
+  document.querySelectorAll('.option-btn').forEach(option => {
+    option.classList.remove('selected');
+  });
+  
+  // Show first question
+  document.querySelectorAll('.question').forEach(question => {
+    question.classList.remove('active');
+  });
+  document.querySelector(`.question[data-question="1"]`).classList.add('active');
+  
+  updateQuizNavigation();
+}
+
+// Journal functionality
 function saveJournalEntry() {
-    const entryText = journalText.value.trim();
-    if (entryText === '') {
-        alert('Please write something before saving.');
-        return;
-    }
-
-    const entry = {
-        text: entryText,
-        date: new Date().toISOString()
-    };
-
-    // Get existing entries or initialize empty array
-    let entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
-    
-    // Add new entry
-    entries.unshift(entry);
-    
-    // Save to local storage
-    localStorage.setItem('journalEntries', JSON.stringify(entries));
-    
-    // Reload entries
-    loadJournalEntries();
-    
-    // Clear textarea
-    journalText.value = '';
-    
-    // Show success message
-    alert('Entry saved successfully!');
+  const text = journalText.value.trim();
+  if (text === '') {
+    alert('Please write something before saving.');
+    return;
+  }
+  
+  const entry = {
+    date: new Date().toLocaleDateString(),
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    text: text
+  };
+  
+  journalEntries.unshift(entry); // Add to beginning of array
+  localStorage.setItem('journalEntries', JSON.stringify(journalEntries));
+  
+  // Update UI
+  loadJournalEntries();
+  journalText.value = '';
+  
+  // Show confirmation
+  alert('Entry saved successfully!');
 }
 
 function clearJournalEntry() {
-    if (journalText.value.trim() !== '' && !confirm('Are you sure you want to clear this entry?')) {
-        return;
-    }
-    journalText.value = '';
+  if (journalText.value.trim() !== '' && !confirm('Are you sure you want to clear this entry?')) {
+    return;
+  }
+  journalText.value = '';
 }
 
 function loadJournalEntries() {
-    const entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
-    entriesList.innerHTML = '';
-
-    if (entries.length === 0) {
-        entriesList.innerHTML = '<p>No entries yet. Start journaling to see them here.</p>';
-        return;
-    }
-
-    entries.forEach(entry => {
-        const entryItem = document.createElement('div');
-        entryItem.classList.add('entry-item');
-        
-        const entryDate = document.createElement('div');
-        entryDate.classList.add('entry-date');
-        entryDate.textContent = new Date(entry.date).toLocaleString();
-        
-        const entryPreview = document.createElement('div');
-        entryPreview.classList.add('entry-preview');
-        entryPreview.textContent = entry.text.length > 150 ? entry.text.substring(0, 150) + '...' : entry.text;
-        
-        entryItem.appendChild(entryDate);
-        entryItem.appendChild(entryPreview);
-        
-        // Add click to view full entry
-        entryItem.addEventListener('click', () => {
-            if (confirm('Would you like to view this full entry?')) {
-                alert(`Entry from ${new Date(entry.date).toLocaleString()}:\n\n${entry.text}`);
-            }
-        });
-        
-        entriesList.appendChild(entryItem);
-    });
-}
-
-// Wellness Tools Functions
-function switchTab(tabId, clickedBtn) {
-    // Update active tab button
-    tabBtns.forEach(btn => btn.classList.remove('active'));
-    clickedBtn.classList.add('active');
-    
-    // Show corresponding content
-    tabContents.forEach(content => {
-        content.classList.remove('active');
-        if (content.id === tabId) {
-            content.classList.add('active');
-        }
-    });
-}
-
-function startBreathingExercise() {
-    if (isBreathingActive) return;
-    isBreathingActive = true;
-    
-    let cycle = 0;
-    const totalCycles = 3; // Number of complete 4-7-8 cycles
-    
-    // Disable start button
-    startBreathingBtn.disabled = true;
-    
-    // Breathing animation
-    breathingInterval = setInterval(() => {
-        if (cycle >= totalCycles) {
-            stopBreathingExercise();
-            return;
-        }
-        
-        // Breathe in (4 seconds)
-        breathText.textContent = 'Breathe In';
-        breathingCircle.style.transform = 'scale(1.2)';
-        breathingCircle.style.backgroundColor = 'rgba(108, 99, 255, 0.3)';
-        
-        setTimeout(() => {
-            // Hold (7 seconds)
-            breathText.textContent = 'Hold';
-            breathingCircle.style.transform = 'scale(1.1)';
-            breathingCircle.style.backgroundColor = 'rgba(76, 175, 80, 0.3)';
-            
-            setTimeout(() => {
-                // Breathe out (8 seconds)
-                breathText.textContent = 'Breathe Out';
-                breathingCircle.style.transform = 'scale(1)';
-                breathingCircle.style.backgroundColor = 'rgba(255, 101, 132, 0.3)';
-                
-                setTimeout(() => {
-                    // Rest between cycles
-                    breathText.textContent = 'Rest';
-                    breathingCircle.style.transform = 'scale(1)';
-                    breathingCircle.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                    cycle++;
-                }, 8000);
-            }, 7000);
-        }, 4000);
-    }, 19000); // Total cycle time (4+7+8)
-}
-
-function stopBreathingExercise() {
-    clearInterval(breathingInterval);
-    isBreathingActive = false;
-    
-    // Reset display
-    breathText.textContent = 'Ready';
-    breathingCircle.style.transform = 'scale(1)';
-    breathingCircle.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-    
-    // Re-enable start button
-    startBreathingBtn.disabled = false;
-}
-
-function toggleSound(btn) {
-    const soundName = btn.getAttribute('data-sound');
-    const soundElement = btn.parentElement.querySelector('audio');
-    
-    // If this sound is already playing, stop it
-    if (currentSound === soundElement) {
-        soundElement.pause();
-        soundElement.currentTime = 0;
-        currentSound = null;
-        btn.innerHTML = '<i class="fas fa-play"></i>';
-        return;
-    }
-    
-    // Stop any currently playing sound
-    if (currentSound) {
-        currentSound.pause();
-        currentSound.currentTime = 0;
-        const currentBtn = document.querySelector(`.sound-btn[data-sound="${currentSound.parentElement.getAttribute('data-sound')}"]`);
-        if (currentBtn) currentBtn.innerHTML = '<i class="fas fa-play"></i>';
-    }
-    
-    // Play the selected sound
-    soundElement.volume = volumeControl.value;
-    soundElement.loop = true;
-    soundElement.play();
-    currentSound = soundElement;
-    btn.innerHTML = '<i class="fas fa-stop"></i>';
-}
-
-function adjustVolume() {
-    if (currentSound) {
-        currentSound.volume = volumeControl.value;
-    }
-}
-
-// Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', init);
-
-
-
-// Wellness Tools State
-const wellnessApp = {
-  breathing: {
-    active: false,
-    timeouts: [],
-    currentCycle: 0,
-    totalCycles: 3
-  },
-  sound: {
-    currentElement: null,
-    currentButton: null
+  entriesList.innerHTML = '';
+  
+  if (journalEntries.length === 0) {
+    entriesList.innerHTML = '<p>No entries yet. Start journaling above!</p>';
+    return;
   }
-};
+  
+  journalEntries.forEach(entry => {
+    const entryElement = document.createElement('div');
+    entryElement.classList.add('journal-entry-item');
+    
+    const dateElement = document.createElement('div');
+    dateElement.classList.add('entry-date');
+    dateElement.textContent = `${entry.date} at ${entry.time}`;
+    
+    const previewElement = document.createElement('div');
+    previewElement.classList.add('entry-preview');
+    previewElement.textContent = entry.text.length > 100 ? entry.text.substring(0, 100) + '...' : entry.text;
+    
+    entryElement.appendChild(dateElement);
+    entryElement.appendChild(previewElement);
+    
+    // Add click to view full entry
+    entryElement.addEventListener('click', () => {
+      if (confirm(`View this entry from ${entry.date}?\n\n"${entry.text}"\n\nWould you like to delete it?`)) {
+        deleteJournalEntry(entry);
+      }
+    });
+    
+    entriesList.appendChild(entryElement);
+  });
+}
 
-// Breathing Exercise Functions
+function deleteJournalEntry(entry) {
+  journalEntries = journalEntries.filter(e => 
+    e.date !== entry.date || e.time !== entry.time || e.text !== entry.text
+  );
+  localStorage.setItem('journalEntries', JSON.stringify(journalEntries));
+  loadJournalEntries();
+}
+
+// Gratitude wall
+function addGratitudeNote() {
+  const note = gratitudeInput.value.trim();
+  if (note === '') return;
+  
+  gratitudeNotes.unshift({
+    text: note,
+    date: new Date().toLocaleDateString()
+  });
+  
+  localStorage.setItem('gratitudeNotes', JSON.stringify(gratitudeNotes));
+  gratitudeInput.value = '';
+  loadGratitudeNotes();
+}
+
+function loadGratitudeNotes() {
+  gratitudeWall.innerHTML = '';
+  
+  if (gratitudeNotes.length === 0) {
+    gratitudeWall.innerHTML = '<p>Add your first gratitude note above!</p>';
+    return;
+  }
+  
+  gratitudeNotes.forEach(note => {
+    const noteElement = document.createElement('div');
+    noteElement.classList.add('gratitude-note');
+    noteElement.innerHTML = `
+      <p>${note.text}</p>
+      <small>${note.date}</small>
+    `;
+    
+    // Add delete on long press
+    noteElement.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (confirm('Delete this gratitude note?')) {
+        gratitudeNotes = gratitudeNotes.filter(n => n.text !== note.text || n.date !== note.date);
+        localStorage.setItem('gratitudeNotes', JSON.stringify(gratitudeNotes));
+        loadGratitudeNotes();
+      }
+    });
+    
+    gratitudeWall.appendChild(noteElement);
+  });
+}
+
+// Daily tips
+function showRandomTip() {
+  dailyTip.textContent = tips[Math.floor(Math.random() * tips.length)];
+}
+
+// Affirmations slider
+function startAffirmationSlider() {
+  const affirmations = document.querySelectorAll('.affirmation');
+  let currentIndex = 0;
+  
+  // Show first affirmation
+  affirmations[currentIndex].classList.add('active');
+  
+  // Rotate affirmations every 8 seconds
+  setInterval(() => {
+    affirmations[currentIndex].classList.remove('active');
+    currentIndex = (currentIndex + 1) % affirmations.length;
+    affirmations[currentIndex].classList.add('active');
+  }, 8000);
+}
+
+// PWA functionality
+function handleBeforeInstallPrompt(e) {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later
+  deferredPrompt = e;
+  // Show the install prompt
+  installPrompt.style.display = 'block';
+}
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  
+  // Show the install prompt
+  deferredPrompt.prompt();
+  
+  // Wait for the user to respond to the prompt
+  deferredPrompt.userChoice.then((choiceResult) => {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+    // Reset the deferred prompt variable
+    deferredPrompt = null;
+    // Hide the install prompt
+    installPrompt.style.display = 'none';
+  });
+}
+
+function dismissInstallPrompt() {
+  installPrompt.style.display = 'none';
+}
+
+// Mobile menu
+function toggleMobileMenu() {
+  navLinks.classList.toggle('active');
+  menuToggle.innerHTML = navLinks.classList.contains('active') ? 
+    '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+}
+
+// Wellness Tools
+// Breathing exercise
 function startBreathingExercise() {
-  if (wellnessApp.breathing.active) return;
+  startBreathingBtn.disabled = true;
+  stopBreathingBtn.disabled = false;
   
-  wellnessApp.breathing.active = true;
-  wellnessApp.breathing.currentCycle = 0;
+  let cycle = 0;
+  const totalCycles = 4;
   
-  const breathingCircle = document.querySelector('.breathing-circle .circle');
-  const breathText = document.querySelector('.breath-text');
-  const startBtn = document.getElementById('start-breathing');
-  const stopBtn = document.getElementById('stop-breathing');
+  breathText.textContent = 'Breathe In';
+  breathingCircle.style.transform = 'scale(1)';
   
-  // Update button states
-  if (startBtn) startBtn.disabled = true;
-  if (stopBtn) stopBtn.disabled = false;
-  
-  function runBreathingCycle() {
-    if (!wellnessApp.breathing.active || wellnessApp.breathing.currentCycle >= wellnessApp.breathing.totalCycles) {
+  breathingInterval = setInterval(() => {
+    cycle++;
+    
+    if (cycle > totalCycles * 2) {
       stopBreathingExercise();
       return;
     }
     
-    // Breathe in (4 seconds)
-    updateBreathingDisplay('Breathe In', 'scale(1.2)', 'rgba(108, 99, 255, 0.3)');
-    
-    wellnessApp.breathing.timeouts.push(setTimeout(() => {
-      // Hold (7 seconds)
-      updateBreathingDisplay('Hold', 'scale(1.1)', 'rgba(76, 175, 80, 0.3)');
-      
-      wellnessApp.breathing.timeouts.push(setTimeout(() => {
-        // Breathe out (8 seconds)
-        updateBreathingDisplay('Breathe Out', 'scale(1)', 'rgba(255, 101, 132, 0.3)');
-        
-        wellnessApp.breathing.timeouts.push(setTimeout(() => {
-          // Rest between cycles
-          updateBreathingDisplay('Rest', 'scale(1)', 'rgba(255, 255, 255, 0.2)');
-          
-          wellnessApp.breathing.currentCycle++;
-          
-          // Start next cycle if not finished
-          if (wellnessApp.breathing.currentCycle < wellnessApp.breathing.totalCycles && 
-              wellnessApp.breathing.active) {
-            wellnessApp.breathing.timeouts.push(
-              setTimeout(runBreathingCycle, 2000) // 2 second rest
-            );
-          } else {
-            stopBreathingExercise();
-          }
-        }, 8000));
-      }, 7000));
-    }, 4000));
-  }
-  
-  // Clear any existing timeouts
-  clearBreathingTimeouts();
-  
-  // Start first cycle
-  runBreathingCycle();
-}
-
-function updateBreathingDisplay(text, transform, bgColor) {
-  const breathText = document.querySelector('.breath-text');
-  const breathingCircle = document.querySelector('.breathing-circle .circle');
-  
-  if (breathText) breathText.textContent = text;
-  if (breathingCircle) {
-    breathingCircle.style.transform = transform;
-    breathingCircle.style.backgroundColor = bgColor;
-  }
-}
-
-function clearBreathingTimeouts() {
-  wellnessApp.breathing.timeouts.forEach(timeout => clearTimeout(timeout));
-  wellnessApp.breathing.timeouts = [];
+    if (cycle % 2 === 1) {
+      // Inhale phase
+      breathText.textContent = 'Breathe In';
+      breathingCircle.style.transform = 'scale(1)';
+      setTimeout(() => {
+        breathText.textContent = 'Hold';
+      }, 4000);
+    } else {
+      // Exhale phase
+      breathText.textContent = 'Breathe Out';
+      breathingCircle.style.transform = 'scale(0.5)';
+    }
+  }, 15000); // Total cycle time (4s in, 7s hold, 8s out)
 }
 
 function stopBreathingExercise() {
-  wellnessApp.breathing.active = false;
-  clearBreathingTimeouts();
-  
-  updateBreathingDisplay('Ready', 'scale(1)', 'rgba(255, 255, 255, 0.2)');
-  
-  const startBtn = document.getElementById('start-breathing');
-  const stopBtn = document.getElementById('stop-breathing');
-  
-  if (startBtn) startBtn.disabled = false;
-  if (stopBtn) stopBtn.disabled = true;
+  clearInterval(breathingInterval);
+  breathText.textContent = 'Ready';
+  breathingCircle.style.transform = 'scale(0.5)';
+  startBreathingBtn.disabled = false;
+  stopBreathingBtn.disabled = true;
 }
 
-// Sound Therapy Functions
-function toggleSound(clickedBtn) {
-  if (!clickedBtn) return;
-
-  const soundOption = clickedBtn.closest('.sound-option');
-  if (!soundOption) return;
-
-  const soundElement = soundOption.querySelector('audio');
-  if (!soundElement) return;
-
-  // If clicking the currently playing sound
-  if (wellnessApp.sound.currentElement === soundElement) {
-    stopCurrentSound();
-    return;
+// Sound therapy
+function toggleSound(e) {
+  const soundBtn = e.currentTarget;
+  const soundOption = soundBtn.closest('.sound-option');
+  const audio = soundOption.querySelector('audio');
+  
+  // Stop any currently playing sound
+  if (currentSound && currentSound !== audio) {
+    currentSound.pause();
+    currentSound.currentTime = 0;
+    const currentBtn = document.querySelector(`.sound-btn[data-sound="${currentSound.dataset.sound}"]`);
+    currentBtn.innerHTML = '<i class="fas fa-play"></i>';
   }
-
-  // Stop any currently playing sound first
-  if (wellnessApp.sound.currentElement) {
-    stopCurrentSound();
-  }
-
-  // Play the new sound
-  playSound(soundElement, clickedBtn);
-}
-
-function playSound(soundElement, button) {
-  const volumeControl = document.getElementById('volume');
-  soundElement.volume = volumeControl ? volumeControl.value : 0.5;
-  soundElement.loop = true;
-
-  const playPromise = soundElement.play();
-
-  if (playPromise !== undefined) {
-    playPromise
-      .then(() => {
-        wellnessApp.sound.currentElement = soundElement;
-        wellnessApp.sound.currentButton = button;
-        
-        if (button) {
-          const icon = button.querySelector('i');
-          if (icon) icon.className = 'fas fa-stop';
-        }
-      })
-      .catch(error => {
-        console.error("Audio playback failed:", error);
-        showAudioError(soundElement.parentElement);
-      });
-  }
-}
-
-function stopCurrentSound() {
-  if (wellnessApp.sound.currentElement) {
-    wellnessApp.sound.currentElement.pause();
-    wellnessApp.sound.currentElement.currentTime = 0;
-    
-    if (wellnessApp.sound.currentButton) {
-      const icon = wellnessApp.sound.currentButton.querySelector('i');
-      if (icon) icon.className = 'fas fa-play';
-    }
-    
-    wellnessApp.sound.currentElement = null;
-    wellnessApp.sound.currentButton = null;
+  
+  if (audio.paused) {
+    audio.play();
+    audio.volume = volumeControl.value;
+    soundBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    currentSound = audio;
+  } else {
+    audio.pause();
+    audio.currentTime = 0;
+    soundBtn.innerHTML = '<i class="fas fa-play"></i>';
+    currentSound = null;
   }
 }
 
 function adjustVolume() {
-  if (wellnessApp.sound.currentElement) {
-    const volumeControl = document.getElementById('volume');
-    if (volumeControl) {
-      wellnessApp.sound.currentElement.volume = volumeControl.value;
-    }
+  if (currentSound) {
+    currentSound.volume = volumeControl.value;
   }
 }
 
-function showAudioError(container) {
-  const existingError = container.querySelector('.sound-error');
-  if (existingError) existingError.remove();
-
-  const errorMsg = document.createElement('div');
-  errorMsg.className = 'sound-error';
-  errorMsg.textContent = "Please click anywhere on the page first to enable audio";
-  errorMsg.style.cssText = `
-    color: #ff4444;
-    margin-top: 10px;
-    font-size: 0.9em;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-  `;
+// Pomodoro timer
+function startTimer() {
+  if (isRunning) return;
   
-  container.appendChild(errorMsg);
-
-  setTimeout(() => {
-    if (errorMsg.parentNode === container) {
-      container.removeChild(errorMsg);
-    }
-  }, 5000);
+  isRunning = true;
+  startTimerBtn.disabled = true;
+  pauseTimerBtn.disabled = false;
+  
+  timerInterval = setInterval(updateTimer, 1000);
 }
 
-// Tab Switching Function
-function switchTab(tabId, clickedBtn) {
-  // Update active tab button
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('active');
-    btn.setAttribute('aria-selected', 'false');
+function pauseTimer() {
+  clearInterval(timerInterval);
+  isRunning = false;
+  startTimerBtn.disabled = false;
+  pauseTimerBtn.disabled = true;
+}
+
+function resetTimer() {
+  pauseTimer();
+  isWorking = true;
+  modeDisplay.textContent = 'Work';
+  timeLeft = parseInt(workDurationInput.value) * 60;
+  updateTimerDisplay();
+}
+
+function updateTimer() {
+  timeLeft--;
+  
+  if (timeLeft <= 0) {
+    // Switch mode
+    isWorking = !isWorking;
+    modeDisplay.textContent = isWorking ? 'Work' : 'Break';
+    timeLeft = (isWorking ? parseInt(workDurationInput.value) : parseInt(breakDurationInput.value)) * 60;
+    
+    // Play notification sound
+    const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+    audio.volume = 0.3;
+    audio.play();
+    
+    // Show notification
+    if (Notification.permission === 'granted') {
+      new Notification(isWorking ? 'Break time is over!' : 'Time for a break!', {
+        body: isWorking ? 'Get back to work!' : 'Take a few minutes to relax.',
+        icon: 'https://i.pinimg.com/736x/b9/f7/b4/b9f7b4e8108b3be189ce87c8b867f10c.jpg'
+      });
+    }
+  }
+  
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  
+  minutesDisplay.textContent = minutes.toString().padStart(2, '0');
+  secondsDisplay.textContent = seconds.toString().padStart(2, '0');
+}
+
+function updateTimerSettings() {
+  if (!isRunning) {
+    timeLeft = (isWorking ? parseInt(workDurationInput.value) : parseInt(breakDurationInput.value)) * 60;
+    updateTimerDisplay();
+  }
+}
+
+// Meditation timer
+function setMeditationTimer(e) {
+  const minutes = parseInt(e.currentTarget.dataset.minutes);
+  customMinutes.value = minutes;
+}
+
+function startMeditationTimer() {
+  const minutes = parseInt(customMinutes.value) || 5;
+  let timeLeft = minutes * 60;
+  
+  startMeditationBtn.style.display = 'none';
+  stopMeditationBtn.style.display = 'inline-block';
+  
+  updateMeditationDisplay(timeLeft);
+  
+  meditationInterval = setInterval(() => {
+    timeLeft--;
+    updateMeditationDisplay(timeLeft);
+    
+    if (timeLeft <= 0) {
+      stopMeditationTimer();
+      // Play completion sound
+      const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-singing-bowl-meditation-1903.mp3');
+      audio.volume = 0.3;
+      audio.play();
+    }
+  }, 1000);
+}
+
+function stopMeditationTimer() {
+  clearInterval(meditationInterval);
+  startMeditationBtn.style.display = 'inline-block';
+  stopMeditationBtn.style.display = 'none';
+  meditationTime.textContent = '00:00';
+}
+
+function updateMeditationDisplay(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  meditationTime.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Mood check
+function selectMood(e) {
+  const color = e.currentTarget.dataset.color;
+  const mood = moodSuggestions[color];
+  
+  // Update selected state
+  colorOptions.forEach(option => {
+    option.style.border = option === e.currentTarget ? '3px solid var(--primary-color)' : 'none';
   });
-  clickedBtn.classList.add('active');
-  clickedBtn.setAttribute('aria-selected', 'true');
+  
+  // Show mood suggestions
+  moodResult.innerHTML = `
+    <h4>${mood.title}</h4>
+    <p>Here are some suggestions that might help:</p>
+    <ul>
+      ${mood.suggestions.map(s => `<li>${s}</li>`).join('')}
+    </ul>
+  `;
+}
+
+// Tab switching
+function switchTab(e) {
+  const tabId = e.currentTarget.dataset.tab;
+  
+  // Update active tab button
+  document.querySelectorAll('.tab-btn').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  e.currentTarget.classList.add('active');
   
   // Show corresponding content
   document.querySelectorAll('.tab-content').forEach(content => {
     content.classList.remove('active');
-    content.setAttribute('aria-hidden', 'true');
-    if (content.id === tabId) {
-      content.classList.add('active');
-      content.setAttribute('aria-hidden', 'false');
-    }
   });
+  document.getElementById(tabId).classList.add('active');
 }
 
-// Initialize Wellness Tools
-function setupWellnessTools() {
-  // Breathing exercise
-  const startBtn = document.getElementById('start-breathing');
-  const stopBtn = document.getElementById('stop-breathing');
-  
-  if (startBtn) startBtn.addEventListener('click', startBreathingExercise);
-  if (stopBtn) {
-    stopBtn.addEventListener('click', stopBreathingExercise);
-    stopBtn.disabled = true;
-  }
-  
-  // Sound therapy
-  document.querySelectorAll('.sound-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleSound(btn);
-    });
-  });
-  
-  // Volume control
-  const volumeControl = document.getElementById('volume');
-  if (volumeControl) {
-    volumeControl.addEventListener('input', adjustVolume);
-  }
-  
-  // Tab switching
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tabId = btn.getAttribute('data-tab');
-      switchTab(tabId, btn);
-    });
-  });
-  
-  // Initialize first tab
-  const defaultTab = document.querySelector('.tab-btn.active');
-  if (defaultTab) {
-    switchTab(defaultTab.getAttribute('data-tab'), defaultTab);
+// Request notification permission
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    Notification.requestPermission();
   }
 }
 
-// Start when DOM is ready
-document.addEventListener('DOMContentLoaded', setupWellnessTools);
+// Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Check for saved theme preference
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    currentTheme = 'dark';
+  }
+  
+  init();
+  requestNotificationPermission();
+  
+  // Initialize timer display
+  updateTimerDisplay();
+});

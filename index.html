@@ -9,238 +9,482 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="glass-nav">
-        <div class="container">
-            <a href="#" class="logo">AI Mental Health Buddy</a>
-            <button class="menu-toggle" aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
-            </button>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#chat">Chat</a></li>
-                <li><a href="#journal">Journal</a></li>
-                <li><a href="#wellness">Wellness</a></li>
-                <li><a href="#resources">Resources</a></li>
-            </ul>
-        </div>
-    </nav>
+<nav class="glass-nav">
+    <div class="container">
+        <a href="#" class="logo">AI Mental Health Buddy</a>
+        <button class="menu-toggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#chat">Chat</a></li>
+            <li><a href="#journal">Journal</a></li>
+            <li><a href="#wellness">Wellness</a></li>
+            <li><a href="#quiz">Mental Health Quiz</a></li>
+            <li><a href="#resources">Resources</a></li>
+            <li>
+                <button id="theme-toggle" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </li>
+        </ul>
+    </div>
+</nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Your Anonymous Mental Health Companion</h1>
-                <p>A safe space to express your feelings, find support, and practice self-care without judgment.</p>
-                <div class="cta-buttons">
-                    <a href="#chat" class="btn primary">Talk to AI Buddy</a>
-                    <a href="#wellness" class="btn secondary">Try Wellness Tools</a>
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Your Anonymous Mental Health Companion</h1>
+            <p>A safe space to express your feelings, find support, and practice self-care without judgment.</p>
+            <div class="cta-buttons">
+                <a href="#chat" class="btn primary">Talk to AI Buddy</a>
+                <a href="#wellness" class="btn secondary">Try Wellness Tools</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="circle-animation"></div>
+            <img src="https://i.pinimg.com/736x/b9/f7/b4/b9f7b4e8108b3be189ce87c8b867f10c.jpg" alt="Mental health illustration" class="glass-img">
+        </div>
+    </div>
+</section>
+
+<!-- Affirmations Section -->
+<section class="affirmations-section">
+    <div class="container">
+        <div class="affirmations-container glass-panel">
+            <h3>Daily Affirmation</h3>
+            <div class="affirmation-slider">
+                <p class="affirmation active">You are stronger than you think</p>
+                <p class="affirmation">You are worthy of love and happiness</p>
+                <p class="affirmation">This too shall pass</p>
+                <p class="affirmation">You are not alone in this</p>
+                <p class="affirmation">Progress, not perfection</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chat Section -->
+<section id="chat" class="chat-section">
+    <div class="container">
+        <h2>Anonymous AI Chat Support</h2>
+        <p>Talk freely about what's on your mind with our non-judgmental AI companion.</p>
+        
+        <div class="chat-container glass-panel">
+            <div class="chat-header">
+                <h3>AI Mental Health Buddy</h3>
+                <span class="status-dot"></span>
+                <span class="status-text">Online</span>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message ai-message">
+                    <p>Hello there! I'm your AI Mental Health Buddy. How are you feeling today?</p>
                 </div>
             </div>
-            <div class="hero-image">
-                <div class="circle-animation"></div>
-                <img src="https://i.pinimg.com/736x/b9/f7/b4/b9f7b4e8108b3be189ce87c8b867f10c.jpg" alt="Mental health illustration" class="glass-img">
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your message here..." aria-label="Chat input">
+                <button id="send-btn" aria-label="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Chat Section -->
-    <section id="chat" class="chat-section">
-        <div class="container">
-            <h2>Anonymous AI Chat Support</h2>
-            <p>Talk freely about what's on your mind with our non-judgmental AI companion.</p>
+<!-- Mental Health Quiz Section -->
+<section id="quiz" class="quiz-section">
+    <div class="container">
+        <h2>Mental Health Check-in</h2>
+        <p>Take a quick assessment to understand your current mental state.</p>
+        
+        <div class="quiz-container glass-panel">
+            <div class="quiz-intro" id="quiz-intro">
+                <h3>How Are You Feeling Today?</h3>
+                <p>This 5-question quiz will help you assess your current mental state. Answer honestly - this is just for you.</p>
+                <button id="start-quiz" class="btn primary">Start Quiz</button>
+            </div>
             
-            <div class="chat-container glass-panel">
-                <div class="chat-header">
-                    <h3>AI Mental Health Buddy</h3>
-                    <span class="status-dot"></span>
-                    <span class="status-text">Online</span>
-                </div>
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message ai-message">
-                        <p>Hello there! I'm your AI Mental Health Buddy. How are you feeling today?</p>
+            <div class="quiz-questions" id="quiz-questions" style="display: none;">
+                <div class="question active" data-question="1">
+                    <h3>Question 1/5</h3>
+                    <p>How often have you felt down, depressed, or hopeless in the past week?</p>
+                    <div class="options">
+                        <button class="option-btn" data-value="0">Not at all</button>
+                        <button class="option-btn" data-value="1">Several days</button>
+                        <button class="option-btn" data-value="2">More than half the days</button>
+                        <button class="option-btn" data-value="3">Nearly every day</button>
                     </div>
-                </div>
-                <div class="chat-input">
-                    <input type="text" id="user-input" placeholder="Type your message here..." aria-label="Chat input">
-                    <button id="send-btn" aria-label="Send message">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Journal Section -->
-    <section id="journal" class="journal-section">
-        <div class="container">
-            <h2>Reflective Journaling</h2>
-            <p>Express your thoughts and track your emotional patterns with our private journal.</p>
-            
-            <div class="journal-container">
-                <div class="journal-prompts glass-panel">
-                    <h3>Journal Prompts</h3>
-                    <ul>
-                        <li>What am I grateful for today?</li>
-                        <li>What emotions am I currently feeling?</li>
-                        <li>What's been weighing on my mind lately?</li>
-                        <li>What self-care did I practice today?</li>
-                        <li>What's one positive thing that happened?</li>
-                    </ul>
                 </div>
                 
-                <div class="journal-entry glass-panel">
-                    <h3>Today's Entry</h3>
-                    <textarea id="journal-text" placeholder="Write your thoughts here..."></textarea>
-                    <div class="journal-actions">
-                        <button id="save-entry" class="btn primary">Save Entry</button>
-                        <button id="clear-entry" class="btn secondary">Clear</button>
+                <div class="question" data-question="2">
+                    <h3>Question 2/5</h3>
+                    <p>How often have you felt little interest or pleasure in doing things?</p>
+                    <div class="options">
+                        <button class="option-btn" data-value="0">Not at all</button>
+                        <button class="option-btn" data-value="1">Several days</button>
+                        <button class="option-btn" data-value="2">More than half the days</button>
+                        <button class="option-btn" data-value="3">Nearly every day</button>
                     </div>
                 </div>
                 
-                <div class="journal-archive glass-panel">
-                    <h3>Previous Entries</h3>
-                    <div class="entries-list" id="entries-list">
-                        <!-- Entries will be loaded here -->
+                <div class="question" data-question="3">
+                    <h3>Question 3/5</h3>
+                    <p>How often have you felt nervous, anxious, or on edge?</p>
+                    <div class="options">
+                        <button class="option-btn" data-value="0">Not at all</button>
+                        <button class="option-btn" data-value="1">Several days</button>
+                        <button class="option-btn" data-value="2">More than half the days</button>
+                        <button class="option-btn" data-value="3">Nearly every day</button>
                     </div>
+                </div>
+                
+                <div class="question" data-question="4">
+                    <h3>Question 4/5</h3>
+                    <p>How often have you felt tired or had little energy?</p>
+                    <div class="options">
+                        <button class="option-btn" data-value="0">Not at all</button>
+                        <button class="option-btn" data-value="1">Several days</button>
+                        <button class="option-btn" data-value="2">More than half the days</button>
+                        <button class="option-btn" data-value="3">Nearly every day</button>
+                    </div>
+                </div>
+                
+                <div class="question" data-question="5">
+                    <h3>Question 5/5</h3>
+                    <p>How often have you felt bad about yourself - or that you're a failure?</p>
+                    <div class="options">
+                        <button class="option-btn" data-value="0">Not at all</button>
+                        <button class="option-btn" data-value="1">Several days</button>
+                        <button class="option-btn" data-value="2">More than half the days</button>
+                        <button class="option-btn" data-value="3">Nearly every day</button>
+                    </div>
+                </div>
+                
+                <div class="quiz-navigation">
+                    <button id="prev-question" class="btn secondary" disabled>Previous</button>
+                    <span class="question-counter">1/5</span>
+                    <button id="next-question" class="btn primary">Next</button>
+                </div>
+            </div>
+            
+            <div class="quiz-results" id="quiz-results" style="display: none;">
+                <h3>Your Results</h3>
+                <div class="result-score">
+                    <span id="score">0</span>/15
+                </div>
+                <div class="result-message" id="result-message">
+                    <!-- Result message will be inserted here -->
+                </div>
+                <div class="result-suggestions" id="result-suggestions">
+                    <!-- Suggestions will be inserted here -->
+                </div>
+                <button id="retake-quiz" class="btn primary">Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Journal Section -->
+<section id="journal" class="journal-section">
+    <div class="container">
+        <h2>Reflective Journaling</h2>
+        <p>Express your thoughts and track your emotional patterns with our private journal.</p>
+        
+        <div class="journal-container">
+            <div class="journal-prompts glass-panel">
+                <h3>Journal Prompts</h3>
+                <ul>
+                    <li>What am I grateful for today?</li>
+                    <li>What emotions am I currently feeling?</li>
+                    <li>What's been weighing on my mind lately?</li>
+                    <li>What self-care did I practice today?</li>
+                    <li>What's one positive thing that happened?</li>
+                </ul>
+            </div>
+            
+            <div class="journal-entry glass-panel">
+                <h3>Today's Entry</h3>
+                <textarea id="journal-text" placeholder="Write your thoughts here..."></textarea>
+                <div class="journal-actions">
+                    <button id="save-entry" class="btn primary">Save Entry</button>
+                    <button id="clear-entry" class="btn secondary">Clear</button>
+                </div>
+            </div>
+            
+            <div class="journal-archive glass-panel">
+                <h3>Previous Entries</h3>
+                <div class="entries-list" id="entries-list">
+                    <!-- Entries will be loaded here -->
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Wellness Tools Section -->
-    <section id="wellness" class="wellness-section">
-        <div class="container">
-            <h2>Wellness Tools</h2>
-            <p>Interactive tools to help you relax and find balance.</p>
-            
-            <div class="wellness-tabs">
-                <button class="tab-btn active" data-tab="breathing">Breathing Exercise</button>
-                <button class="tab-btn" data-tab="sounds">Sound Therapy</button>
+<!-- Gratitude Wall Section -->
+<section class="gratitude-section">
+    <div class="container">
+        <h2>Gratitude Wall</h2>
+        <p>Write something you're grateful for and add it to your personal gratitude wall.</p>
+        
+        <div class="gratitude-container glass-panel">
+            <div class="gratitude-input">
+                <input type="text" id="gratitude-input" placeholder="I'm grateful for..." maxlength="100">
+                <button id="add-gratitude" class="btn primary">Add</button>
+            </div>
+            <div class="gratitude-wall" id="gratitude-wall">
+                <!-- Gratitude notes will be added here -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Wellness Tools Section -->
+<section id="wellness" class="wellness-section">
+    <div class="container">
+        <h2>Wellness Tools</h2>
+        <p>Interactive tools to help you relax and find balance.</p>
+        
+        <div class="wellness-tabs">
+            <button class="tab-btn active" data-tab="breathing">Breathing Exercise</button>
+            <button class="tab-btn" data-tab="sounds">Sound Therapy</button>
+            <button class="tab-btn" data-tab="pomodoro">Pomodoro Timer</button>
+            <button class="tab-btn" data-tab="meditation">Guided Meditation</button>
+            <button class="tab-btn" data-tab="mood">Mood Check</button>
+        </div>
+        
+        <div class="wellness-content">
+            <div id="breathing" class="tab-content active">
+                <div class="breathing-container glass-panel">
+                    <h3>4-7-8 Breathing Technique</h3>
+                    <p>Breathe in for 4 seconds, hold for 7 seconds, exhale for 8 seconds.</p>
+                    <div class="breathing-circle">
+                        <div class="circle"></div>
+                        <div class="breath-text">Ready</div>
+                    </div>
+                    <div class="breathing-controls">
+                        <button id="start-breathing" class="btn primary">Start</button>
+                        <button id="stop-breathing" class="btn secondary">Stop</button>
+                    </div>
+                </div>
             </div>
             
-            <div class="wellness-content">
-                <div id="breathing" class="tab-content active">
-                    <div class="breathing-container glass-panel">
-                        <h3>4-7-8 Breathing Technique</h3>
-                        <p>Breathe in for 4 seconds, hold for 7 seconds, exhale for 8 seconds.</p>
-                        <div class="breathing-circle">
-                            <div class="circle"></div>
-                            <div class="breath-text">Ready</div>
+            <div id="sounds" class="tab-content">
+                <div class="sounds-container glass-panel">
+                    <h3>Calming Sounds</h3>
+                    <p>Select a sound to help you relax or focus.</p>
+                    <div class="sound-options">
+                        <div class="sound-option">
+                            <i class="fas fa-water"></i>
+                            <span>Ocean Waves</span>
+                            <audio src="https://assets.mixkit.co/sfx/preview/mixkit-ocean-waves-ambient-1864.mp3"></audio>
+                            <button class="sound-btn" data-sound="ocean">
+                                <i class="fas fa-play"></i>
+                            </button>
                         </div>
-                        <div class="breathing-controls">
-                            <button id="start-breathing" class="btn primary">Start</button>
-                            <button id="stop-breathing" class="btn secondary">Stop</button>
+                        <div class="sound-option">
+                            <i class="fas fa-tree"></i>
+                            <span>Forest</span>
+                            <audio src="https://assets.mixkit.co/sfx/preview/mixkit-forest-ambience-1683.mp3"></audio>
+                            <button class="sound-btn" data-sound="forest">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        <div class="sound-option">
+                            <i class="fas fa-cloud-rain"></i>
+                            <span>Rain</span>
+                            <audio src="https://assets.mixkit.co/sfx/preview/mixkit-rain-loop-1246.mp3"></audio>
+                            <button class="sound-btn" data-sound="rain">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                        <div class="sound-option">
+                            <i class="fas fa-wind"></i>
+                            <span>White Noise</span>
+                            <audio src="https://assets.mixkit.co/sfx/preview/mixkit-wind-ambience-240.mp3"></audio>
+                            <button class="sound-btn" data-sound="wind">
+                                <i class="fas fa-play"></i>
+                            </button>
                         </div>
                     </div>
-                </div>
-                
-                <div id="sounds" class="tab-content">
-                    <div class="sounds-container glass-panel">
-                        <h3>Calming Sounds</h3>
-                        <p>Select a sound to help you relax or focus.</p>
-                        <div class="sound-options">
-                            <div class="sound-option">
-                                <i class="fas fa-water"></i>
-                                <span>Ocean Waves</span>
-                                <audio src="https://assets.mixkit.co/sfx/preview/mixkit-ocean-waves-ambient-1864.mp3"></audio>
-                                <button class="sound-btn" data-sound="ocean">
-                                    <i class="fas fa-play"></i>
-                                </button>
-                            </div>
-                            <div class="sound-option">
-                                <i class="fas fa-tree"></i>
-                                <span>Forest</span>
-                                <audio src="https://assets.mixkit.co/sfx/preview/mixkit-forest-ambience-1683.mp3"></audio>
-                                <button class="sound-btn" data-sound="forest">
-                                    <i class="fas fa-play"></i>
-                                </button>
-                            </div>
-                            <div class="sound-option">
-                                <i class="fas fa-cloud-rain"></i>
-                                <span>Rain</span>
-                                <audio src="https://assets.mixkit.co/sfx/preview/mixkit-rain-loop-1246.mp3"></audio>
-                                <button class="sound-btn" data-sound="rain">
-                                    <i class="fas fa-play"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="volume-control">
-                            <label for="volume">Volume:</label>
-                            <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
-                        </div>
+                    <div class="volume-control">
+                        <label for="volume">Volume:</label>
+                        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Resources Section -->
-    <section id="resources" class="resources-section">
-        <div class="container">
-            <h2>Mental Health Resources</h2>
-            <p>Important information and crisis support when you need it.</p>
             
-            <div class="resources-grid">
-                <div class="resource-card glass-panel">
-                    <i class="fas fa-phone-alt"></i>
-                    <h3>Crisis Hotlines</h3>
-                    <ul>
-                        <li>National Suicide Prevention Lifeline: <strong>988</strong></li>
-                        <li>Crisis Text Line: Text <strong>HOME</strong> to 741741</li>
-                        <li>Veterans Crisis Line: <strong>1-800-273-8255</strong></li>
-                    </ul>
+            <div id="pomodoro" class="tab-content">
+                <div class="pomodoro-container glass-panel">
+                    <h3>Pomodoro Timer</h3>
+                    <p>Work for 25 minutes, then take a 5 minute break.</p>
+                    <div class="timer-display">
+                        <span id="minutes">25</span>:<span id="seconds">00</span>
+                    </div>
+                    <div class="timer-mode">
+                        <span id="mode">Work</span>
+                    </div>
+                    <div class="timer-controls">
+                        <button id="start-timer" class="btn primary">Start</button>
+                        <button id="pause-timer" class="btn secondary">Pause</button>
+                        <button id="reset-timer" class="btn secondary">Reset</button>
+                    </div>
+                    <div class="timer-settings">
+                        <div class="setting">
+                            <label for="work-duration">Work (minutes):</label>
+                            <input type="number" id="work-duration" min="1" max="60" value="25">
+                        </div>
+                        <div class="setting">
+                            <label for="break-duration">Break (minutes):</label>
+                            <input type="number" id="break-duration" min="1" max="30" value="5">
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="resource-card glass-panel">
-                    <i class="fas fa-book"></i>
-                    <h3>Self-Help Resources</h3>
-                    <ul>
-                        <li><a href="#" target="_blank">Mental Health America</a></li>
-                        <li><a href="#" target="_blank">Anxiety and Depression Association</a></li>
-                        <li><a href="#" target="_blank">Mindfulness Exercises</a></li>
-                    </ul>
+            </div>
+            
+            <div id="meditation" class="tab-content">
+                <div class="meditation-container glass-panel">
+                    <h3>Guided Meditation</h3>
+                    <p>Take a few minutes to relax and focus on your breathing.</p>
+                    <div class="meditation-player">
+                        <iframe width="100%" height="200" src="https://www.youtube.com/embed/inpok4MKVLM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="meditation-timer">
+                        <h4>Quick Meditation Timer</h4>
+                        <div class="timer-buttons">
+                            <button class="btn secondary" data-minutes="1">1 min</button>
+                            <button class="btn secondary" data-minutes="3">3 min</button>
+                            <button class="btn secondary" data-minutes="5">5 min</button>
+                            <button class="btn secondary" data-minutes="10">10 min</button>
+                        </div>
+                        <div class="custom-timer">
+                            <input type="number" id="custom-minutes" min="1" max="60" placeholder="Minutes">
+                            <button id="start-meditation" class="btn primary">Start</button>
+                        </div>
+                        <div class="meditation-display">
+                            <span id="meditation-time">00:00</span>
+                            <button id="stop-meditation" class="btn secondary" style="display: none;">Stop</button>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="resource-card glass-panel">
-                    <i class="fas fa-heart"></i>
-                    <h3>Self-Care Tips</h3>
-                    <ul>
-                        <li>Practice deep breathing daily</li>
-                        <li>Maintain a regular sleep schedule</li>
-                        <li>Stay connected with loved ones</li>
-                        <li>Engage in physical activity</li>
-                    </ul>
+            </div>
+            
+            <div id="mood" class="tab-content">
+                <div class="mood-container glass-panel">
+                    <h3>Mood Check</h3>
+                    <p>Select the color that best represents your current mood.</p>
+                    <div class="color-picker">
+                        <div class="color-option" data-color="red" data-mood="Angry/Frustrated" style="background-color: #ff6b6b;"></div>
+                        <div class="color-option" data-color="blue" data-mood="Sad/Depressed" style="background-color: #74b9ff;"></div>
+                        <div class="color-option" data-color="green" data-mood="Calm/Peaceful" style="background-color: #55efc4;"></div>
+                        <div class="color-option" data-color="yellow" data-mood="Happy/Joyful" style="background-color: #ffeaa7;"></div>
+                        <div class="color-option" data-color="purple" data-mood="Anxious/Stressed" style="background-color: #a29bfe;"></div>
+                        <div class="color-option" data-color="gray" data-mood="Tired/Exhausted" style="background-color: #dfe6e9;"></div>
+                    </div>
+                    <div class="mood-result" id="mood-result">
+                        <p>Select a color above to see personalized suggestions</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <h3>AI Mental Health Buddy</h3>
-                    <p>Providing anonymous emotional support whenever you need it.</p>
-                </div>
-                <div class="footer-links">
-                    <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#chat">Chat</a></li>
-                        <li><a href="#journal">Journal</a></li>
-                        <li><a href="#wellness">Wellness</a></li>
-                        <li><a href="#resources">Resources</a></li>
-                    </ul>
-                </div>
-                <div class="footer-disclaimer">
-                    <p><strong>Note:</strong> This is not a substitute for professional mental health care. In crisis situations, please contact emergency services.</p>
-                </div>
+<!-- Daily Tip Section -->
+<section class="tip-section">
+    <div class="container">
+        <div class="tip-container glass-panel">
+            <h3>Daily Mental Health Tip</h3>
+            <p id="daily-tip">Practice deep breathing for 5 minutes when you wake up to start your day calmly.</p>
+            <button id="new-tip" class="btn secondary">Get Another Tip</button>
+        </div>
+    </div>
+</section>
+
+<!-- Resources Section -->
+<section id="resources" class="resources-section">
+    <div class="container">
+        <h2>Mental Health Resources</h2>
+        <p>Important information and crisis support when you need it.</p>
+        
+        <div class="resources-grid">
+            <div class="resource-card glass-panel">
+                <i class="fas fa-phone-alt"></i>
+                <h3>Crisis Hotlines</h3>
+                <ul>
+                    <li>National Suicide Prevention Lifeline: <strong>988</strong></li>
+                    <li>Crisis Text Line: Text <strong>HOME</strong> to 741741</li>
+                    <li>Veterans Crisis Line: <strong>1-800-273-8255</strong></li>
+                </ul>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2023 AI Mental Health Buddy. All rights reserved.</p>
+            
+            <div class="resource-card glass-panel">
+                <i class="fas fa-book"></i>
+                <h3>Self-Help Resources</h3>
+                <ul>
+                    <li><a href="https://www.mhanational.org/" target="_blank">Mental Health America</a></li>
+                    <li><a href="https://adaa.org/" target="_blank">Anxiety and Depression Association</a></li>
+                    <li><a href="https://www.mindful.org/" target="_blank">Mindfulness Exercises</a></li>
+                </ul>
+            </div>
+            
+            <div class="resource-card glass-panel">
+                <i class="fas fa-heart"></i>
+                <h3>Self-Care Tips</h3>
+                <ul>
+                    <li>Practice deep breathing daily</li>
+                    <li>Maintain a regular sleep schedule</li>
+                    <li>Stay connected with loved ones</li>
+                    <li>Engage in physical activity</li>
+                </ul>
             </div>
         </div>
-    </footer>
+    </div>
+</section>
+
+<!-- Add to Home Screen Prompt -->
+<div id="install-prompt" class="install-prompt glass-panel">
+    <p>Add Mental Health Buddy to your home screen for quick access!</p>
+    <div class="prompt-buttons">
+        <button id="install-btn" class="btn primary">Install</button>
+        <button id="dismiss-prompt" class="btn secondary">Not Now</button>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>AI Mental Health Buddy</h3>
+                <p>Providing anonymous emotional support whenever you need it.</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#chat">Chat</a></li>
+                    <li><a href="#journal">Journal</a></li>
+                    <li><a href="#wellness">Wellness</a></li>
+                    <li><a href="#quiz">Mental Health Quiz</a></li>
+                    <li><a href="#resources">Resources</a></li>
+                </ul>
+            </div>
+            <div class="footer-disclaimer">
+                <p><strong>Note:</strong> This is not a substitute for professional mental health care. In crisis situations, please contact emergency services.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 AI Mental Health Buddy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- Manifest for PWA -->
+<link rel="manifest" href="manifest.json">
 
     <script src="script.js"></script>
 </body>
